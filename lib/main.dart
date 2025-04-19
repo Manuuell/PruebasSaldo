@@ -24,20 +24,26 @@ class ConsultaSaldoPage extends StatefulWidget {
 
 class _ConsultaSaldoPageState extends State<ConsultaSaldoPage> {
   final TextEditingController _ctr = TextEditingController();
+  bool _loading = false;
+  String? _saldo;
+  String? _error;
 
   Future<void> consultarSaldo(String numTarjeta) async {
-    final url = Uri.parse(
-      'https://recaudo.sondapay.com/recaudowsrest/producto/consultaTrx',
-    );
+    setState(() {
+      _loading = true;
+      _saldo = null;
+      _error = null;
+    });
 
-    // Cabeceras idénticas a las de la web
+    final url = Uri.parse(
+        'https://recaudo.sondapay.com/recaudowsrest/producto/consultaTrx');
+
     final headers = {
       'Content-Type': 'application/json; charset=UTF-8',
       'Accept': '*/*',
       'Origin': 'https://transcaribe.gov.co',
     };
 
-    // Payload tal cual se ve en DevTools de TransCaribe
     final body = jsonEncode({
       'nivelConsulta': 1,
       'tipoConsulta': 2,
@@ -53,24 +59,37 @@ class _ConsultaSaldoPageState extends State<ConsultaSaldoPage> {
         print('Respuesta cruda: $data');
 
         if (data['estado'] == 0 && data['saldo'] != null) {
-          print('Saldo disponible: ${data['saldo']}');
+          setState(() {
+            _saldo = data['saldo'].toString();
+          });
         } else {
-          print('Error del servicio: ${data['mensaje']}');
+          setState(() {
+            _error = data['mensaje'] ?? 'Error desconocido';
+          });
         }
       } else {
-        print('Error HTTP: ${resp.statusCode}');
+        setState(() {
+          _error = 'Error HTTP: ${resp.statusCode}';
+        });
       }
     } catch (e) {
-      print('Excepción: $e');
+      setState(() {
+        _error = 'Excepción: $e';
+      });
+    } finally {
+      setState(() {
+        _loading = false;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFFFDF1F9),
       appBar: AppBar(
         title: Text('Consulta tu Saldo'),
-        backgroundColor: Colors.orange,
+        backgroundColor: Color(0xFFFF6F00),
       ),
       body: Padding(
         padding: EdgeInsets.all(16),
@@ -87,19 +106,76 @@ class _ConsultaSaldoPageState extends State<ConsultaSaldoPage> {
             SizedBox(height: 16),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange,
+                backgroundColor: Color(0xFFFF6F00),
                 minimumSize: Size(double.infinity, 48),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24),
+                ),
               ),
-              onPressed: () {
+              onPressed: _loading
+                  ? null
+                  : () {
                 final num = _ctr.text.trim();
                 if (num.isEmpty) {
-                  print('Ingresa un número de tarjeta.');
+                  setState(() {
+                    _error = 'Ingresa un número de tarjeta.';
+                  });
                 } else {
                   consultarSaldo(num);
                 }
               },
-              child: Text('Consultar Saldo'),
+              child: _loading
+                  ? CircularProgressIndicator(color: Colors.white)
+                  : Text('Consultar Saldo'),
             ),
+            if (_error != null) ...[
+              SizedBox(height: 20),
+              Text(
+                _error!,
+                style: TextStyle(color: Colors.red),
+              ),
+            ],
+            if (_saldo != null)
+              Padding(
+                padding: EdgeInsets.only(top: 32),
+                child: Container(
+                  padding: EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: Color(0xFFFF6F00),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 10,
+                        offset: Offset(4, 4),
+                      )
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Image.asset(
+                        'assets/images/logo_trasca.png',
+                        height: 60,
+                      ),
+                      SizedBox(height: 12),
+                      Text(
+                        'Saldo disponible',
+                        style: TextStyle(fontSize: 18, color: Colors.white),
+                      ),
+                      SizedBox(height: 6),
+                      Text(
+                        '\$$_saldo',
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
           ],
         ),
       ),

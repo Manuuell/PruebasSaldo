@@ -1,5 +1,5 @@
 name: consulta_saldo_transcaribe
-description: Aplicación Flutter para consultar saldo de tarjeta Transcaribe
+description: Aplicación Flutter para consultar saldo de tarjeta Transcaribe.
 publish_to: 'none' # No se publicará en pub.dev
 
 version: 1.0.0+1
@@ -14,6 +14,7 @@ dependencies:
   webview_flutter: ^4.0.7
   cupertino_icons: ^1.0.8
   google_fonts: ^4.0.3
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -21,3 +22,6 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  assets:
+    - assets/images/logo_trasca.png
