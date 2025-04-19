@@ -42,7 +42,6 @@ Esta aplicación Flutter permite consultar el **saldo disponible de una tarjeta 
 ### 1. Crea una carpeta y entra en ella
 
 ```bash
-```bash
 mkdir consulta_saldo_transcaribe
 cd consulta_saldo_transcaribe
 ```
@@ -50,7 +49,7 @@ cd consulta_saldo_transcaribe
 2. Clona el repositorio
 
 ```bash
-git clone https://github.com/tuusuario/consulta_saldo_transcaribe.git .
+git clone https://github.com/tuusuario/consulta_saldo_transcaribe.git 
 
 ```
  3. Instala las dependencias
