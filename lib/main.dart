@@ -118,7 +118,7 @@ class _ConsultaSaldoPageState extends State<ConsultaSaldoPage> {
                 final num = _ctr.text.trim();
                 if (num.isEmpty) {
                   setState(() {
-                    _error = 'Ingresa un número de tarjeta.';
+                    _error = 'Ingresa un número de tarjetaa.';
                   });
                 } else {
                   consultarSaldo(num);
